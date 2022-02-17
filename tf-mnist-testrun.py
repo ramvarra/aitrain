@@ -1,12 +1,10 @@
 import tensorflow as tf
 import numpy as np
-import seaborn as sns
-import pandas as pd
 from datetime import datetime
 
 import util
 
-EPOCHS = 5
+EPOCHS = 50
 BATCH_SIZE = 64
 VERBOSE = 1
 NUM_CLASSES = 10 # number of digits 0..9
