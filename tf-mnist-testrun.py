@@ -52,7 +52,7 @@ print("Starting the training")
 ts_start = datetime.now()
 history = model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=EPOCHS, verbose=VERBOSE, validation_split=VALIDATION_SPLIT)
 elapsed = datetime.now() - ts_start
-print(f"Tooks {elapsed} to train {EPOCHS} epocs. Time/epoch = {elapsed/EPOCHS} seconds")
+print(f"Took {elapsed} to train {EPOCHS} epocs. Time/epoch = {elapsed/EPOCHS} seconds")
 
 print("Evaluating the mode:")
 loss, acc = model.evaluate(x_test, y_test)
