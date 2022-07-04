@@ -1,10 +1,11 @@
+
+import argparse
 import tensorflow as tf
 import numpy as np
 from datetime import datetime
 
-EPOCHS = 50
+DEFAULT_EPOCHS = 50
 BATCH_SIZE = 64
-VERBOSITY = 0       # silent
 NUM_CLASSES = 10    # number of digits 0..9
 N_HIDDEN = 128
 VALIDATION_SPLIT = .2 # portion of train data reserved for validation
@@ -23,10 +24,13 @@ def show_tf_info(tf):
     print('Physical Devices:', tf.config.list_physical_devices())
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Tensorflow MNIST Training and Evaluation Tool')
+    parser.add_argument("--epochs", "-e", type=int, default=DEFAULT_EPOCHS, help=f'number of epochs - default {DEFAULT_EPOCHS}')
+    parser.add_argument("--verbose", "-v", type=int, default=0, help=f'verbose - 0 (default): silent, 1: progress bar 2: detailed log')
+    args = parser.parse_args()
     show_tf_info(tf)
 
     # load data
-    print("Loading training data")
     (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
     # reshape the X into 2D, convert to float32, normalize by dividing by 255
     x_train, x_test = (x.reshape(x.shape[0], -1).astype(np.float32)/255 for x in (x_train, x_test))
@@ -39,32 +43,32 @@ if __name__ == '__main__':
     show_stats("y_test", y_test)
 
     # Build the model
-    model = tf.keras.models.Sequential(name='MNIST-2H')
+    model = tf.keras.models.Sequential(name='MNIST-3H')
     for layer in [
-        tf.keras.layers.Dense(N_HIDDEN, name='hidden_layer_01', input_shape=(x_train.shape[1],),  activation='relu'),
+        tf.keras.layers.Dense(N_HIDDEN, name='hidden_relu_01', input_shape=(x_train.shape[1],),  activation='relu'),
         tf.keras.layers.Dropout(DROP_OUT),
-        tf.keras.layers.Dense(N_HIDDEN, name='hidden_layer_02', activation='relu'),
+        tf.keras.layers.Dense(N_HIDDEN, name='hidden_relu_02', activation='relu'),
         tf.keras.layers.Dropout(DROP_OUT),
-        tf.keras.layers.Dense(N_HIDDEN, name='hidden_layer_03', activation='relu'),
+        tf.keras.layers.Dense(N_HIDDEN, name='hidden_relu_03', activation='relu'),
         tf.keras.layers.Dropout(DROP_OUT),
-        tf.keras.layers.Dense(NUM_CLASSES, name='ouput_layer', activation='softmax'),
+        tf.keras.layers.Dense(NUM_CLASSES, name='output_softmax', activation='softmax'),
     ]: model.add(layer)
 
     # compile the model
     model.compile(optimizer='SGD', loss='categorical_crossentropy', metrics=['accuracy'])
 
-    print(model.summary())
+    model.summary()
 
-    print("Starting the training")
+    print(f"Starting the training - {args.epochs} epochs")
     ts_start = datetime.now()
-    history = model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=EPOCHS, verbose=VERBOSITY, validation_split=VALIDATION_SPLIT)
+    history = model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=args.epochs, verbose=args.verbose, validation_split=VALIDATION_SPLIT)
     elapsed = datetime.now() - ts_start
-    print(f"Took {elapsed} to train {EPOCHS} epocs. Time/epoch = {elapsed/EPOCHS} seconds")
+    print(f"Training time {elapsed} for {args.epochs} epocs. Time/epoch = {elapsed/args.epochs} seconds")
 
     print("Evaluating the model")
 
     ts_start = datetime.now()
-    loss, acc = model.evaluate(x_test, y_test)
+    loss, acc = model.evaluate(x_test, y_test, verbose=args.verbose)
     elapsed = datetime.now() - ts_start
-    print(f"Took {elapsed} to evaluate {len(x_test)} results.")
-    print(f"Model Accuracy = {acc}")
+    print(f"Evaluation time {elapsed} for {len(x_test)} samples.")
+    print(f"Test Accuracy = {acc}")
