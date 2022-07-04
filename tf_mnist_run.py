@@ -28,7 +28,7 @@ def show_tf_info():
     print('Physical Devices:', tf.config.list_physical_devices())
 
 
-def run(epochs: int=DEFAULT_EPOCHS, verbose: int=0):
+def run(epochs: int=DEFAULT_EPOCHS, verbose: int=0, tensorboard: bool=False):
     # load data
     (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
     # reshape the X into 2D, convert to float32, normalize by dividing by 255
@@ -59,8 +59,14 @@ def run(epochs: int=DEFAULT_EPOCHS, verbose: int=0):
     model.summary()
 
     print(f"Starting the training - {epochs} epochs")
+    tb_args = {}
+    if tensorboard:
+        log_dir = "logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+        tb_args = dict(callbacks=[tensorboard_callback])
+
     ts_start = datetime.now()
-    history = model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=epochs, verbose=verbose, validation_split=VALIDATION_SPLIT)
+    history = model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=epochs, verbose=verbose, validation_split=VALIDATION_SPLIT, **tb_args)
     elapsed = datetime.now() - ts_start
     print(f"Training time {elapsed} for {epochs} epocs. Time/epoch = {elapsed/epochs} seconds")
 
@@ -80,11 +86,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Tensorflow MNIST Training and Evaluation Tool')
     parser.add_argument("--epochs", "-e", type=int, default=DEFAULT_EPOCHS, help=f'number of epochs - default {DEFAULT_EPOCHS}')
     parser.add_argument("--verbose", "-v", type=int, default=0, help=f'verbose - 0 (default): silent, 1: progress bar 2: detailed log')
+    parser.add_argument("--tensorboard", "-t", default=False, action='store_true', help='log tensorboard data - default False')
     args = parser.parse_args()
 
     show_tf_info()
 
-    run(args.epochs, args.verbose)
+    run(args.epochs, args.verbose, args.tensorboard)
 
 
 
