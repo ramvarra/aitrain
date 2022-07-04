@@ -3,6 +3,10 @@ import argparse
 import tensorflow as tf
 import numpy as np
 from datetime import datetime
+import os
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
 
 DEFAULT_EPOCHS = 50
 BATCH_SIZE = 64
