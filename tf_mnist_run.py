@@ -12,10 +12,10 @@ VALIDATION_SPLIT = .2 # portion of train data reserved for validation
 DROP_OUT = 0.3
 
 
-def show_stats(name, v):
+def show_stats(name : str, v: np.ndarray):
     print(f"{name}.shape: {v.shape} dtype: {v.dtype}, min: {v.min()}, max: {v.max()}, mean: {v.mean()}")
 
-def show_tf_info(tf):
+def show_tf_info():
     '''
     Display information about the TF package
     '''
@@ -23,13 +23,8 @@ def show_tf_info(tf):
     print('Logical Devices:', tf.config.list_logical_devices())
     print('Physical Devices:', tf.config.list_physical_devices())
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Tensorflow MNIST Training and Evaluation Tool')
-    parser.add_argument("--epochs", "-e", type=int, default=DEFAULT_EPOCHS, help=f'number of epochs - default {DEFAULT_EPOCHS}')
-    parser.add_argument("--verbose", "-v", type=int, default=0, help=f'verbose - 0 (default): silent, 1: progress bar 2: detailed log')
-    args = parser.parse_args()
-    show_tf_info(tf)
 
+def run(epochs: int=DEFAULT_EPOCHS, verbose: int=0):
     # load data
     (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
     # reshape the X into 2D, convert to float32, normalize by dividing by 255
@@ -59,16 +54,33 @@ if __name__ == '__main__':
 
     model.summary()
 
-    print(f"Starting the training - {args.epochs} epochs")
+    print(f"Starting the training - {epochs} epochs")
     ts_start = datetime.now()
-    history = model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=args.epochs, verbose=args.verbose, validation_split=VALIDATION_SPLIT)
+    history = model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=epochs, verbose=verbose, validation_split=VALIDATION_SPLIT)
     elapsed = datetime.now() - ts_start
-    print(f"Training time {elapsed} for {args.epochs} epocs. Time/epoch = {elapsed/args.epochs} seconds")
+    print(f"Training time {elapsed} for {epochs} epocs. Time/epoch = {elapsed/epochs} seconds")
 
     print("Evaluating the model")
 
     ts_start = datetime.now()
-    loss, acc = model.evaluate(x_test, y_test, verbose=args.verbose)
+    loss, acc = model.evaluate(x_test, y_test, verbose=verbose)
     elapsed = datetime.now() - ts_start
     print(f"Evaluation time {elapsed} for {len(x_test)} samples.")
     print(f"Test Accuracy = {acc}")
+    return {
+        'history': history,
+        'model': model
+    }
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Tensorflow MNIST Training and Evaluation Tool')
+    parser.add_argument("--epochs", "-e", type=int, default=DEFAULT_EPOCHS, help=f'number of epochs - default {DEFAULT_EPOCHS}')
+    parser.add_argument("--verbose", "-v", type=int, default=0, help=f'verbose - 0 (default): silent, 1: progress bar 2: detailed log')
+    args = parser.parse_args()
+
+    show_tf_info()
+
+    run(args.epochs, args.verbose)
+
+
+
