@@ -49,13 +49,15 @@ def run(epochs: int=DEFAULT_EPOCHS, verbose: int=0, tensorboard: bool=False):
     (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
     # reshape the X into 2D, convert to float32, normalize by dividing by 255
     x_train, x_test = (x.reshape(x.shape[0], -1).astype(np.float32)/255 for x in (x_train, x_test))
-    show_stats("x_train", x_train)
-    show_stats("x_test", x_test)
+    if verbose > 0:
+        show_stats("x_train", x_train)
+        show_stats("x_test", x_test)
 
     # One hot encode Y
     y_train, y_test = (tf.keras.utils.to_categorical(y, NUM_CLASSES) for y in (y_train, y_test))
-    show_stats("y_train", y_train)
-    show_stats("y_test", y_test)
+    if verbose > 0:
+        show_stats("y_train", y_train)
+        show_stats("y_test", y_test)
 
     # Build the model
     model = tf.keras.models.Sequential(name='MNIST-3H')
@@ -72,7 +74,8 @@ def run(epochs: int=DEFAULT_EPOCHS, verbose: int=0, tensorboard: bool=False):
     # compile the model
     model.compile(optimizer='SGD', loss='categorical_crossentropy', metrics=['accuracy'])
 
-    model.summary()
+    if verbose > 0:
+        model.summary()
 
     print(f"Starting the training - {epochs} epochs")
     tb_args = {}
