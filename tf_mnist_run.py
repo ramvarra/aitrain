@@ -16,6 +16,21 @@ N_HIDDEN = 128
 VALIDATION_SPLIT = .2 # portion of train data reserved for validation
 DROP_OUT = 0.3
 
+def get_cnvrg_info():
+    info_dict = dict(
+        org = os.environ.get('CNVRG_ORGANIZATION', ''),    
+        cluster = os.environ.get('CNVRG_COMPUTE_CLUSTER', ''),
+        project = os.environ.get('CNVRG_PROJECT', ''),
+        compute_template = os.environ.get('CNVRG_COMPUTE_TEMPLATE', ''),        
+        cpu = os.environ.get('CNVRG_COMPUTE_CPU', '').replace('.0',''),
+        memory = os.environ.get('CNVRG_COMPUTE_MEMORY', '').replace('.0',''),        
+        user = os.environ.get('CNVRG_USER', ''),
+        job_name = os.environ.get('CNVRG_JOB_NAME', ''),
+        job_id = os.environ.get('CNVRG_JOB_ID', ''),
+        
+    )
+    info = " ".join(f"{k}='{v}'" for k,v in info_dict.items())
+    return info
 
 def show_stats(name : str, v: np.ndarray):
     print(f"{name}.shape: {v.shape} dtype: {v.dtype}, min: {v.min()}, max: {v.max()}, mean: {v.mean()}")
