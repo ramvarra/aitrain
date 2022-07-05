@@ -6,7 +6,7 @@ from datetime import datetime
 import os
 
 # To DISABLE GPU
-#os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
 DEFAULT_EPOCHS = 50
