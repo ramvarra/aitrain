@@ -106,7 +106,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     show_tf_info()
-
+    print('Cnvrg: ', get_cnvrg_info())
     run(args.epochs, args.verbose, args.tensorboard)
 
 
