@@ -1,12 +1,11 @@
-
+# To DISABLE GPU
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import argparse
 import tensorflow as tf
 import numpy as np
 from datetime import datetime
-import os
 
-# To DISABLE GPU
-#os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
 DEFAULT_EPOCHS = 50
@@ -16,6 +15,21 @@ N_HIDDEN = 128
 VALIDATION_SPLIT = .2 # portion of train data reserved for validation
 DROP_OUT = 0.3
 
+def get_cnvrg_info():
+    info_dict = dict(
+        org = os.environ.get('CNVRG_ORGANIZATION', ''),    
+        cluster = os.environ.get('CNVRG_COMPUTE_CLUSTER', ''),
+        project = os.environ.get('CNVRG_PROJECT', ''),
+        compute_template = os.environ.get('CNVRG_COMPUTE_TEMPLATE', ''),        
+        cpu = os.environ.get('CNVRG_COMPUTE_CPU', '').replace('.0',''),
+        memory = os.environ.get('CNVRG_COMPUTE_MEMORY', '').replace('.0',''),        
+        user = os.environ.get('CNVRG_USER', ''),
+        job_name = os.environ.get('CNVRG_JOB_NAME', ''),
+        job_id = os.environ.get('CNVRG_JOB_ID', ''),
+        
+    )
+    info = " ".join(f"{k}='{v}'" for k,v in info_dict.items())
+    return info
 
 def show_stats(name : str, v: np.ndarray):
     print(f"{name}.shape: {v.shape} dtype: {v.dtype}, min: {v.min()}, max: {v.max()}, mean: {v.mean()}")
@@ -34,13 +48,15 @@ def run(epochs: int=DEFAULT_EPOCHS, verbose: int=0, tensorboard: bool=False):
     (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
     # reshape the X into 2D, convert to float32, normalize by dividing by 255
     x_train, x_test = (x.reshape(x.shape[0], -1).astype(np.float32)/255 for x in (x_train, x_test))
-    show_stats("x_train", x_train)
-    show_stats("x_test", x_test)
+    if verbose > 0:
+        show_stats("x_train", x_train)
+        show_stats("x_test", x_test)
 
     # One hot encode Y
     y_train, y_test = (tf.keras.utils.to_categorical(y, NUM_CLASSES) for y in (y_train, y_test))
-    show_stats("y_train", y_train)
-    show_stats("y_test", y_test)
+    if verbose > 0:
+        show_stats("y_train", y_train)
+        show_stats("y_test", y_test)
 
     # Build the model
     model = tf.keras.models.Sequential(name='MNIST-3H')
@@ -57,7 +73,8 @@ def run(epochs: int=DEFAULT_EPOCHS, verbose: int=0, tensorboard: bool=False):
     # compile the model
     model.compile(optimizer='SGD', loss='categorical_crossentropy', metrics=['accuracy'])
 
-    model.summary()
+    if verbose > 0:
+        model.summary()
 
     print(f"Starting the training - {epochs} epochs")
     tb_args = {}
@@ -91,8 +108,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     show_tf_info()
-
+    print('Cnvrg: ', get_cnvrg_info())
     run(args.epochs, args.verbose, args.tensorboard)
-
 
 
