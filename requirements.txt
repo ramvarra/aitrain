@@ -1,3 +1,3 @@
-pandas
-tensorflow
-seaborn
+#pandas
+#tensorflow
+#seaborn
