@@ -8,7 +8,7 @@ from datetime import datetime
 
 
 
-DEFAULT_EPOCHS = 50
+DEFAULT_EPOCHS = 5
 BATCH_SIZE = 64
 NUM_CLASSES = 10    # number of digits 0..9
 N_HIDDEN = 128
@@ -17,16 +17,16 @@ DROP_OUT = 0.3
 
 def get_cnvrg_info():
     info_dict = dict(
-        org = os.environ.get('CNVRG_ORGANIZATION', ''),    
+        org = os.environ.get('CNVRG_ORGANIZATION', ''),
         cluster = os.environ.get('CNVRG_COMPUTE_CLUSTER', ''),
         project = os.environ.get('CNVRG_PROJECT', ''),
-        compute_template = os.environ.get('CNVRG_COMPUTE_TEMPLATE', ''),        
+        compute_template = os.environ.get('CNVRG_COMPUTE_TEMPLATE', ''),
         cpu = os.environ.get('CNVRG_COMPUTE_CPU', '').replace('.0',''),
-        memory = os.environ.get('CNVRG_COMPUTE_MEMORY', '').replace('.0',''),        
+        memory = os.environ.get('CNVRG_COMPUTE_MEMORY', '').replace('.0',''),
         user = os.environ.get('CNVRG_USER', ''),
         job_name = os.environ.get('CNVRG_JOB_NAME', ''),
         job_id = os.environ.get('CNVRG_JOB_ID', ''),
-        
+
     )
     info = " ".join(f"{k}='{v}'" for k,v in info_dict.items())
     return info
@@ -110,5 +110,3 @@ if __name__ == '__main__':
     show_tf_info()
     print('Cnvrg: ', get_cnvrg_info())
     run(args.epochs, args.verbose, args.tensorboard)
-
-
